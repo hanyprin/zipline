@@ -23,6 +23,7 @@ import cProfile
 from line_profiler import LineProfiler
 import datetime
 
+import zipline
 from zipline import run_algo
 
 DEFAULTS = {
@@ -44,7 +45,6 @@ def main(argv=None):
     # We make this parser with add_help=False so that
     # it doesn't parse -h and print help.
     conf_parser = argparse.ArgumentParser(
-        description=__doc__, # printed with -h/--help
         # Don't mess with format of description
         formatter_class=argparse.RawDescriptionHelpFormatter,
         # Turn off help, so we print all options in response to -h
@@ -66,6 +66,7 @@ def main(argv=None):
     # Don't suppress add_help here so it will handle -h
     parser = argparse.ArgumentParser(
         # Inherit options from config_parser
+        description="Zipline version %s." % zipline.__version__,
         parents=[conf_parser]
     )
 
