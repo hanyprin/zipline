@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from zipline.api import order, record
+import matplotlib.pyplot as plt
 
 def initialize(context):
     pass
@@ -24,7 +25,6 @@ def handle_data(context, data):
     record(AAPL=data['AAPL'].price)
 
 def analyze(context, perf):
-    import matplotlib.pyplot as plt
     ax1 = plt.subplot(211)
     perf.portfolio_value.plot(ax=ax1)
     ax2 = plt.subplot(212, sharex=ax1)
