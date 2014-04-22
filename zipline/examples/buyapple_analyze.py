@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2012 Quantopian, Inc.
+# Copyright 2014 Quantopian, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from zipline.api import order, record
+import matplotlib.pyplot as plt
 
-def initialize(context):
-    pass
-
-def handle_data(context, data):
-    order('AAPL', 10)
-    record(AAPL=data['AAPL'].price)
+def analyze(context, perf):
+    ax1 = plt.subplot(211)
+    perf.portfolio_value.plot(ax=ax1)
+    ax2 = plt.subplot(212, sharex=ax1)
+    perf.AAPL.plot(ax=ax2)
+    plt.gcf().set_size_inches(18, 8)
+    plt.show()

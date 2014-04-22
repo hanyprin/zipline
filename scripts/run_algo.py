@@ -97,6 +97,12 @@ def setup(args):
     with open(args.algofile, 'r') as fd:
         algo_text = fd.read()
 
+    analyze_fname = os.path.splitext(args.algofile)[0] + '_analyze.py'
+    if os.path.exists(analyze_fname):
+        with open(analyze_fname, 'r') as fd:
+            # Simply append
+            algo_text += fd.read()
+
     if PYGMENTS:
         highlight(algo_text, PythonLexer(), TerminalFormatter(), outfile=sys.stdout)
     else:
