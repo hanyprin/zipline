@@ -1,26 +1,38 @@
+#
+# Copyright 2014 Quantopian, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
 import ConfigParser
 import sys
-sys.path.append('qexec')
 import os
-
-import pandas as pd
+from copy import copy
 
 import cProfile
 from line_profiler import LineProfiler
 import datetime
 
-import zipline
-from zipline import TradingAlgorithm
+from zipline import run_algo
 
-try:
-    from pygments import highlight
-    from pygments.lexers import PythonLexer
-    from pygments.formatters import TerminalFormatter
-    from pygments.styles import STYLE_MAP
-    PYGMENTS = True
-except:
-    PYGMENTS = False
+DEFAULTS = {
+    'start': '2012-01-01',
+    'end': '2012-12-31',
+    'data_frequency': 'daily',
+    'capital_base': '10e6',
+    'source': 'yahoo',
+    'symbols': 'AAPL'
+}
 
 def main(argv=None):
     # Do argv default this way, as doing it in the functional
@@ -43,14 +55,7 @@ def main(argv=None):
                              metavar="FILE")
     args, remaining_argv = conf_parser.parse_known_args()
 
-    defaults = {
-            'start': '2012-01-01',
-            'end': '2012-12-31',
-            'data_frequency': 'daily',
-            'capital_base': '10e6',
-            'source': 'yahoo',
-            'symbols': 'AAPL'
-    }
+    defaults = copy(DEFAULTS)
 
     if args.conf_file:
         config = ConfigParser.SafeConfigParser()
@@ -78,40 +83,9 @@ def main(argv=None):
                                                     'line_profiler'))
     args = parser.parse_args(remaining_argv)
 
-    print args
-    setup(args)
+    run_algo(**vars(args))
 
     return(0)
-
-def setup(args):
-    start = pd.Timestamp(args.start, tz='UTC')
-    end = pd.Timestamp(args.end, tz='UTC')
-
-    symbols = args.symbols.split(',')
-
-    if args.source == 'yahoo':
-        source = zipline.data.load_bars_from_yahoo(stocks=symbols, start=start, end=end)
-    else:
-        raise NotImplementedError('Source %s not implemented.' % args.source)
-
-    with open(args.algofile, 'r') as fd:
-        algo_text = fd.read()
-
-    analyze_fname = os.path.splitext(args.algofile)[0] + '_analyze.py'
-    if os.path.exists(analyze_fname):
-        with open(analyze_fname, 'r') as fd:
-            # Simply append
-            algo_text += fd.read()
-
-    if PYGMENTS:
-        highlight(algo_text, PythonLexer(), TerminalFormatter(), outfile=sys.stdout)
-    else:
-        print algo_text
-
-    algo = TradingAlgorithm(script=algo_text,
-                            capital_base=float(args.capital_base))
-
-    perf = algo.run(source)
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -31,6 +31,8 @@ from . import transforms
 from . algorithm import TradingAlgorithm
 from . import api
 
+from .utils.run import run_algo
+
 __all__ = [
     'data',
     'finance',
