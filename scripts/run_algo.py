@@ -34,21 +34,19 @@ def main(argv=None):
                              metavar="FILE")
     args, remaining_argv = conf_parser.parse_known_args()
 
-    if args.conf_file:
-        config = ConfigParser.SafeConfigParser()
-        config.read([args.conf_file])
-        defaults = dict(config.items("Defaults"))
-    else:
-        defaults = {}
-
-    defaults.update({
+    defaults = {
             'start': '2012-01-01',
             'end': '2012-12-31',
             'data_frequency': 'daily',
             'capital_base': '10e6',
             'source': 'yahoo',
             'symbols': 'AAPL'
-    })
+    }
+
+    if args.conf_file:
+        config = ConfigParser.SafeConfigParser()
+        config.read([args.conf_file])
+        defaults.update(dict(config.items("Defaults")))
 
     # Parse rest of arguments
     # Don't suppress add_help here so it will handle -h
