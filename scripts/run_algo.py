@@ -13,6 +13,15 @@ import datetime
 import zipline
 from zipline import TradingAlgorithm
 
+try:
+    from pygments import highlight
+    from pygments.lexers import PythonLexer
+    from pygments.formatters import TerminalFormatter
+    from pygments.styles import STYLE_MAP
+    PYGMENTS = True
+except:
+    PYGMENTS = False
+
 def main(argv=None):
     # Do argv default this way, as doing it in the functional
     # declaration sets it at compile time.
@@ -88,7 +97,11 @@ def setup(args):
     with open(args.algofile, 'r') as fd:
         algo_text = fd.read()
 
-    print algo_text
+    if PYGMENTS:
+        highlight(algo_text, PythonLexer(), TerminalFormatter(), outfile=sys.stdout)
+    else:
+        print algo_text
+
     algo = TradingAlgorithm(script=algo_text,
                             capital_base=float(args.capital_base))
 
